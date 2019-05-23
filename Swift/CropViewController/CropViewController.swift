@@ -473,7 +473,7 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     @param aspectRatioPreset The aspect ratio preset
     @param animated Whether the transition to the aspect ratio is animated
     */
-    public func setAspectRatioPreset(_ aspectRatio: CropViewControllerAspectRatioPreset, animated: Bool) {
+    open func setAspectRatioPreset(_ aspectRatio: CropViewControllerAspectRatioPreset, animated: Bool) {
         toCropViewController.setAspectRatioPresent(aspectRatio, animated: animated)
     }
     
