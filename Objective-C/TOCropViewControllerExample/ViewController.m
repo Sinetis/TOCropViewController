@@ -58,7 +58,7 @@
 
     // -- Uncomment this line of code to show a confirmation dialog when cancelling --
     //cropController.showCancelConfirmationDialog = YES;
-
+    cropController.fieldsButtonHidden = YES;
     // Uncomment this if you wish to always show grid
     //cropController.cropView.alwaysShowCroppingGrid = YES;
 
@@ -114,6 +114,7 @@
     self.angle = angle;
     [self updateImageViewWithImage:image fromCropViewController:cropViewController];
 }
+
 
 - (void)cropViewController:(TOCropViewController *)cropViewController didCropToCircularImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
 {

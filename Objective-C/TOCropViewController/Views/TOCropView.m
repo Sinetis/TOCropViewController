@@ -112,6 +112,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
  has been properly set up in its parent. */
 @property (nonatomic, assign) BOOL initialSetupPerformed;
 
+// NEW
+@property (nonatomic, assign, readwrite) BOOL isHaveFields;
+
 @end
 
 @implementation TOCropView
@@ -760,6 +763,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)toggleTranslucencyViewVisible:(BOOL)visible
 {
+    [self hideFields];
+    
     if (self.dynamicBlurEffect == NO) {
         self.translucencyView.alpha = visible ? 1.0f : 0.0f;
     }
@@ -1396,6 +1401,47 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }];
 }
 
+// MARK: - NEW
+// NEW .this is what we are here for.
+
+- (void)setAspectFit
+{
+    CGSize image = self.foregroundImageView.frame.size;
+    CGSize crop = self.cropBoxFrame.size;
+
+    CGFloat s = crop.height/image.height;
+    image.height *= s;
+    image.width *= s;
+
+    if (image.width > crop.width)
+    {
+        s = crop.width/image.width;
+        image.height *= s;
+        image.width *= s;
+    }
+
+    int x = (crop.width - image.width)/2;
+    int y = (crop.height - image.height)/2;
+    
+    self.foregroundImageView.frame = CGRectMake(x, y, image.width, image.height);
+    [self showFields];
+}
+
+- (void)showFields
+{
+    self.foregroundContainerView.backgroundColor = [UIColor whiteColor];
+    self.gridOverlayView.hidden = YES;
+    self.isHaveFields = YES;
+}
+
+- (void)hideFields
+{
+    self.foregroundContainerView.backgroundColor = [UIColor clearColor];
+    self.gridOverlayView.hidden = NO;
+    self.isHaveFields = NO;
+}
+// MARK: -
+
 - (void)setAspectRatio:(CGSize)aspectRatio
 {
     [self setAspectRatio:aspectRatio animated:NO];
@@ -1441,7 +1487,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         CGFloat boundsWidth = CGRectGetWidth(boundsFrame);
         if (newWidth > boundsWidth) {
             CGFloat scale = boundsWidth / newWidth;
-
+            
             // Scale the new height
             CGFloat newHeight = cropBoxFrame.size.height * scale;
             delta = cropBoxFrame.size.height - newHeight;

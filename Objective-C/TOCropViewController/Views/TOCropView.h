@@ -37,6 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TOCropView : UIView
 
+// NEW
+@property (nonatomic, assign, readonly) BOOL isHaveFields;
+
 /**
  The image that the crop view is displaying. This cannot be changed once the crop view is instantiated.
  */
@@ -285,6 +288,13 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  fills the entire crop view region
  */
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated;
+
+// MARK: - NEW
+/**
+ 
+ */
+- (void)setAspectFit;
+// MARK: -
 
 @end
 

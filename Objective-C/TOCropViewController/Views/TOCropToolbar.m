@@ -36,7 +36,7 @@
 
 @property (nonatomic, strong) UIButton *resetButton;
 @property (nonatomic, strong) UIButton *clampButton;
-
+@property (nonatomic, strong) UIButton *fieldsButton; // NEW
 @property (nonatomic, strong) UIButton *rotateButton; // defaults to counterclockwise button for legacy compatibility
 
 @property (nonatomic, assign) BOOL reverseContentLayout; // For languages like Arabic where they natively present content flipped from English
@@ -70,6 +70,8 @@
     // Get the resource bundle depending on the framework/dependency manager we're using
     NSBundle *resourceBundle = TO_CROP_VIEW_RESOURCE_BUNDLE_FOR_OBJECT(self);
     
+    // DONE
+    
     _doneTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_doneTextButton setTitle: _doneTextButtonTitle ?
         _doneTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Done",
@@ -89,8 +91,9 @@
     [_doneIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_doneIconButton];
     
-    _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    // CANCEL
     
+    _cancelTextButton = [UIButton buttonWithType:UIButtonTypeSystem];
     [_cancelTextButton setTitle: _cancelTextButtonTitle ?
         _cancelTextButtonTitle : NSLocalizedStringFromTableInBundle(@"Cancel",
 																	@"TOCropViewControllerLocalizable",
@@ -107,12 +110,16 @@
     [_cancelIconButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_cancelIconButton];
     
+    // CLAMP
+    
     _clampButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _clampButton.contentMode = UIViewContentModeCenter;
     _clampButton.tintColor = [UIColor whiteColor];
     [_clampButton setImage:[TOCropToolbar clampImage] forState:UIControlStateNormal];
     [_clampButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_clampButton];
+    
+    // ROTATE counter
     
     _rotateCounterclockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateCounterclockwiseButton.contentMode = UIViewContentModeCenter;
@@ -121,12 +128,16 @@
     [_rotateCounterclockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_rotateCounterclockwiseButton];
     
+    // ROTATE noncounter
+    
     _rotateClockwiseButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _rotateClockwiseButton.contentMode = UIViewContentModeCenter;
     _rotateClockwiseButton.tintColor = [UIColor whiteColor];
     [_rotateClockwiseButton setImage:[TOCropToolbar rotateCWImage] forState:UIControlStateNormal];
     [_rotateClockwiseButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_rotateClockwiseButton];
+    
+    // RESET
     
     _resetButton = [UIButton buttonWithType:UIButtonTypeSystem];
     _resetButton.contentMode = UIViewContentModeCenter;
@@ -135,6 +146,15 @@
     [_resetButton setImage:[TOCropToolbar resetImage] forState:UIControlStateNormal];
     [_resetButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_resetButton];
+    
+    // NEW
+    
+    _fieldsButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    _fieldsButton.contentMode = UIViewContentModeCenter;
+    _fieldsButton.tintColor = [UIColor whiteColor];
+    [_fieldsButton setImage:[TOCropToolbar fieldsImage] forState:UIControlStateNormal];
+    [_fieldsButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_fieldsButton];
 }
 
 - (void)layoutSubviews
@@ -222,6 +242,10 @@
         
         if (!self.resetButtonHidden) {
             [buttonsInOrderHorizontally addObject:self.resetButton];
+        }
+        
+        if (!self.fieldsButtonHidden) {
+            [buttonsInOrderHorizontally addObject:self.fieldsButton];
         }
         
         if (!self.clampButtonHidden) {
@@ -319,6 +343,11 @@
     }
     else if (button == self.clampButton && self.clampButtonTapped) {
         self.clampButtonTapped();
+        return;
+    }
+    // NEW
+    else if (button == self.fieldsButton && self.fieldsButtonTapped) {
+        self.fieldsButtonTapped();
         return;
     }
 }
@@ -491,6 +520,40 @@
     return rotateCWImage;
 }
 
+// NEW FIELDS IMAGE
+//*
++ (UIImage *)fieldsImage
+{
+    UIImage *fieldsImage = nil;
+    
+    UIGraphicsBeginImageContextWithOptions((CGSize){22,16}, NO, 0.0f);
+    {
+        UIBezierPath* rectangle = UIBezierPath.bezierPath;
+        [rectangle moveToPoint: CGPointMake(0, 0)];
+        [rectangle addLineToPoint: CGPointMake(0, 15)];
+        [rectangle addLineToPoint: CGPointMake(21, 15)];
+        [rectangle addLineToPoint: CGPointMake(21, 0)];
+        [rectangle closePath];
+        [UIColor.whiteColor setStroke];
+        rectangle.lineWidth = 1;
+        [rectangle stroke];
+        
+        UIBezierPath* square = UIBezierPath.bezierPath;
+        [square moveToPoint: CGPointMake(6, 0)];
+        [square addLineToPoint: CGPointMake(6, 15)];
+        [square addLineToPoint: CGPointMake(16, 15)];
+        [square addLineToPoint: CGPointMake(16, 0)];
+        [square closePath];
+        [UIColor.whiteColor setFill];
+        [square fill];
+        
+        fieldsImage = UIGraphicsGetImageFromCurrentImageContext();
+    }
+    UIGraphicsEndImageContext();
+    
+    return fieldsImage;
+}//*/
+
 + (UIImage *)resetImage
 {
     UIImage *resetImage = nil;
@@ -602,6 +665,7 @@
     
     [self setNeedsLayout];
 }
+
 - (UIButton *)rotateButton
 {
     return self.rotateCounterclockwiseButton;

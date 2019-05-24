@@ -129,6 +129,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.clampButtonTapped = ^{ [weakSelf showAspectRatioDialog]; };
     self.toolbar.rotateCounterclockwiseButtonTapped = ^{ [weakSelf rotateCropViewCounterclockwise]; };
     self.toolbar.rotateClockwiseButtonTapped        = ^{ [weakSelf rotateCropViewClockwise]; };
+    // NEW
+    self.toolbar.fieldsButtonTapped = ^{ [weakSelf createFieldsOnPhoto]; };
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -689,6 +691,13 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:NO];
 }
 
+// MARK: - NEW
+- (void)createFieldsOnPhoto
+{
+    [self.cropView setAspectFit];
+}
+// MARK: - 
+
 #pragma mark - Crop View Delegates -
 - (void)cropViewDidBecomeResettable:(TOCropView *)cropView
 {
@@ -960,6 +969,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         self.onDidCropImageToRect(cropFrame, angle);
         isCallbackOrDelegateHandled = YES;
     }
+    
 
     // Check if the circular APIs were implemented
     BOOL isCircularImageDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToCircularImage:withRect:angle:)];
@@ -997,6 +1007,11 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         
         //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            
+            if ([self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:withFields:)]) {
+                [self.delegate cropViewController:self didCropToImage: image withRect:cropFrame angle:angle withFields: self.cropView.isHaveFields];
+            }
+            
             if (isDidCropToImageDelegateAvailable) {
                 [self.delegate cropViewController:self didCropToImage:image withRect:cropFrame angle:angle];
             }
@@ -1109,6 +1124,20 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 {
     self.toolbar.resetButtonHidden = resetButtonHidden;
 }
+
+// MARK: - NEW
+
+- (void)setFieldsButtonHidden:(BOOL)fieldsButtonHidden
+{
+    self.toolbar.fieldsButtonHidden = fieldsButtonHidden;
+}
+
+- (BOOL)fieldsButtonHidden
+{
+    return self.toolbar.fieldsButtonHidden;
+}
+
+// MARK: -
 
 - (BOOL)rotateButtonsHidden
 {

@@ -42,7 +42,7 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
     
         //cropController.rotateButtonsHidden = true
         //cropController.rotateClockwiseButtonHidden = true
-    
+        ////cropController.fieldsButtonHidden = true
         //cropController.doneButtonTitle = "Title"
         //cropController.cancelButtonTitle = "Title"
         

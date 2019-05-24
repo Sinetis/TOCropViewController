@@ -58,6 +58,12 @@
             didCropToImage:(nonnull UIImage *)image withRect:(CGRect)cropRect
                      angle:(NSInteger)angle;
 
+// MARK: NEW
+
+- (void)cropViewController:(nonnull TOCropViewController *)cropViewController
+            didCropToImage:(nonnull UIImage *)image withRect:(CGRect)cropRect
+                     angle:(NSInteger)angle withFields:(BOOL)withFields;
+
 /**
  If the cropping style is set to circular, implementing this delegate will return a circle-cropped version of the selected
  image, as well as it's cropping co-ordinates
@@ -222,6 +228,9 @@
  Default is NO.
  */
 @property (nonatomic, assign) BOOL rotateClockwiseButtonHidden;
+
+// MARK: NEW
+@property (nonatomic, assign) BOOL fieldsButtonHidden;
 
 /*
  If this controller is embedded in UINavigationController its navigation bar is hidden by default. Set this property to false to show the navigation bar. This must be set before this controller is presented.

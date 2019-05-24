@@ -59,6 +59,9 @@ public typealias CropViewCroppingStyle = TOCropViewCroppingStyle
      */
     @objc optional func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int)
     
+    // NEW
+    @objc optional func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int, withFields: Bool)
+    
     /**
      If the cropping style is set to circular, implementing this delegate will return a circle-cropped version of the selected
      image, as well as it's cropping co-ordinates
@@ -247,6 +250,12 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         get { return toCropViewController.resetButtonHidden }
     }
     
+    // MARK: NEW
+    public var fieldsButtonHidden: Bool {
+        set { toCropViewController.fieldsButtonHidden = newValue }
+        get { return toCropViewController.fieldsButtonHidden }
+    }
+    
     /**
      When enabled, hides the 'Aspect Ratio Picker' button on the toolbar.
      
@@ -255,6 +264,12 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     public var aspectRatioPickerButtonHidden: Bool {
         set { toCropViewController.aspectRatioPickerButtonHidden = newValue }
         get { return toCropViewController.aspectRatioPickerButtonHidden }
+    }
+    
+    // NEW
+    public var withFieldsButtonHidden: Bool {
+        set { toCropViewController.fieldsButtonHidden = newValue }
+        get { return toCropViewController.fieldsButtonHidden }
     }
     
     /**
@@ -473,7 +488,7 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     @param aspectRatioPreset The aspect ratio preset
     @param animated Whether the transition to the aspect ratio is animated
     */
-    open func setAspectRatioPreset(_ aspectRatio: CropViewControllerAspectRatioPreset, animated: Bool) {
+    public func setAspectRatioPreset(_ aspectRatio: CropViewControllerAspectRatioPreset, animated: Bool) {
         toCropViewController.setAspectRatioPresent(aspectRatio, animated: animated)
     }
     

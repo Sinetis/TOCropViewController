@@ -52,6 +52,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonnull, nonatomic, strong, readonly)  UIButton *clampButton;
 @property (nullable, nonatomic, strong, readonly) UIButton *rotateClockwiseButton;
 
+// NEW
+@property (nonnull, nonatomic, strong, readonly) UIButton *fieldsButton;
+@property (nonatomic, assign) BOOL fieldsButtonHidden;
+@property (nullable, nonatomic, copy) void (^fieldsButtonTapped)(void);
+
 @property (nonnull, nonatomic, readonly) UIButton *rotateButton; // Points to `rotateCounterClockwiseButton`
 
 /* Button feedback handler blocks */
