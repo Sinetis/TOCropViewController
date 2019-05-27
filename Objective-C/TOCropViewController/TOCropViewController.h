@@ -59,7 +59,7 @@
                      angle:(NSInteger)angle;
 
 // MARK: NEW
-
+// -------------------------------------------------------------------------------------------------------------
 - (void)cropViewController:(nonnull TOCropViewController *)cropViewController
             didCropToImage:(nonnull UIImage *)image withRect:(CGRect)cropRect
                      angle:(NSInteger)angle withFields:(BOOL)withFields;
@@ -230,6 +230,7 @@
 @property (nonatomic, assign) BOOL rotateClockwiseButtonHidden;
 
 // MARK: NEW
+//--------------------------------------------------------------------------------------------------------------
 @property (nonatomic, assign) BOOL fieldsButtonHidden;
 
 /*
@@ -310,6 +311,9 @@
  @param angle The angle of the image when it was cropped
  */
 @property (nullable, nonatomic, strong) void (^onDidCropToRect)(UIImage* _Nonnull image, CGRect cropRect, NSInteger angle);
+
+// MARK: NEW
+@property (nullable, nonatomic, strong) void (^onDidCropToRectWithFields)(UIImage* _Nonnull image, CGRect cropRect, NSInteger angle, BOOL withFields);
 
 /**
  If the cropping style is set to circular, this block will return a circle-cropped version of the selected

@@ -337,6 +337,13 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         get { return toCropViewController.onDidCropToRect }
     }
     
+    // MARK: - NEW
+    
+    public var onDidCropToRectWithFields: ((UIImage, CGRect, NSInteger, Bool) -> (Void))? {
+        set { toCropViewController.onDidCropToRectWithFields = newValue}
+        get { return toCropViewController.onDidCropToRectWithFields}
+    }
+    
     /**
      If the cropping style is set to circular, this block will return a circle-cropped version of the selected
      image, as well as it's cropping co-ordinates
@@ -596,6 +603,12 @@ extension CropViewController {
         if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didCropToImage:withRect:angle:))) {
             self.onDidCropToRect = {[unowned self] image, rect, angle in
                 delegate.cropViewController!(self, didCropToImage: image, withRect: rect, angle: angle)
+            }
+        }
+        
+        if delegate.responds(to: #selector(CropViewControllerDelegate.cropViewController(_:didCropToImage:withRect:angle:withFields:))) {
+            self.onDidCropToRectWithFields = {[unowned self] image, rect, angle, withFields in
+                delegate.cropViewController!(self, didCropToImage: image, withRect: rect, angle: angle, withFields: withFields)
             }
         }
         

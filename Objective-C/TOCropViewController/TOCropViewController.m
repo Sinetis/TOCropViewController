@@ -977,7 +977,9 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
     // Check if non-circular was implemented
     BOOL isDidCropToImageDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:)];
+    BOOL isDidCropToImageWithFieldsDelegateAvailable = [self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:withFields:)];
     BOOL isDidCropToImageCallbackAvailable = self.onDidCropToRect != nil;
+    BOOL isDidCropToImageWithFieldsCallbackAvailable = self.onDidCropToRectWithFields != nil;
 
     //If cropping circular and the circular generation delegate/block is implemented, call it
     if (self.croppingStyle == TOCropViewCroppingStyleCircular && (isCircularImageDelegateAvailable || isCircularImageCallbackAvailable)) {
@@ -996,7 +998,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         isCallbackOrDelegateHandled = YES;
     }
     //If the delegate/block that requires the specific cropped image is provided, call it
-    else if (isDidCropToImageDelegateAvailable || isDidCropToImageCallbackAvailable) {
+    else if (isDidCropToImageDelegateAvailable || isDidCropToImageCallbackAvailable ||
+             isDidCropToImageWithFieldsDelegateAvailable || isDidCropToImageWithFieldsCallbackAvailable) {
         UIImage *image = nil;
         if (angle == 0 && CGRectEqualToRect(cropFrame, (CGRect){CGPointZero, self.image.size})) {
             image = self.image;
@@ -1008,7 +1011,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
         //Dispatch on the next run-loop so the animation isn't interuppted by the crop operation
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.03f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             
-            if ([self.delegate respondsToSelector:@selector(cropViewController:didCropToImage:withRect:angle:withFields:)]) {
+            if (isDidCropToImageWithFieldsDelegateAvailable) {
                 [self.delegate cropViewController:self didCropToImage: image withRect:cropFrame angle:angle withFields: self.cropView.isHaveFields];
             }
             
@@ -1018,6 +1021,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
             if (isDidCropToImageCallbackAvailable) {
                 self.onDidCropToRect(image, cropFrame, angle);
+            }
+            
+            if (isDidCropToImageWithFieldsCallbackAvailable) {
+                self.onDidCropToRectWithFields(image, cropFrame, angle, self.cropView.isHaveFields);
             }
         });
         

@@ -116,7 +116,7 @@
 }
 
 
-- (void)cropViewController:(TOCropViewController *)cropViewController didCropToCircularImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle
+- (void)cropViewController:(TOCropViewController *)cropViewController didCropToImage:(UIImage *)image withRect:(CGRect)cropRect angle:(NSInteger)angle withFields:(BOOL)withFields
 {
     self.croppedFrame = cropRect;
     self.angle = angle;

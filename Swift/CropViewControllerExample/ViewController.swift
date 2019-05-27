@@ -66,11 +66,22 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         }
     }
     
-    public func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
+    
+    
+    func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage,
+                            withRect cropRect: CGRect, angle: Int, withFields: Bool) {
         self.croppedRect = cropRect
         self.croppedAngle = angle
         updateImageViewWithImage(image, fromCropViewController: cropViewController)
+        if withFields {
+            view.backgroundColor = UIColor.green
+        }
+        else {
+            view.backgroundColor = UIColor.red
+        }
     }
+    
+    //public func cropView
     
     public func cropViewController(_ cropViewController: CropViewController, didCropToCircularImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
         self.croppedRect = cropRect
