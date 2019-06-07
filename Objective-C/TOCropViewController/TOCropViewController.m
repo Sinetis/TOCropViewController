@@ -694,7 +694,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 // MARK: - NEW
 - (void)createFieldsOnPhoto
 {
-    [self.cropView setAspectFit];
+    [self.cropView toggleFields];
 }
 // MARK: - 
 

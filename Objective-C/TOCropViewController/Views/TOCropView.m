@@ -76,7 +76,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, assign, readwrite) CGRect cropBoxFrame;  /* The frame, in relation to to this view where the grid, and crop container view are aligned */
 @property (nonatomic, strong) NSTimer *resetTimer;  /* The timer used to reset the view after the user stops interacting with it */
 @property (nonatomic, assign) BOOL editing;         /* Used to denote the active state of the user manipulating the content */
-@property (nonatomic, assign) BOOL disableForgroundMatching; /* At times during animation, disable matching the forground image view to the background */
+@property (nonatomic, assign) BOOL disableForegroundMatching; /* At times during animation, disable matching the foreground image view to the background */
 
 /* Pre-screen-rotation state information */
 @property (nonatomic, assign) CGPoint rotationContentOffset;
@@ -418,7 +418,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)matchForegroundToBackground
 {
-    if (self.disableForgroundMatching)
+    if (self.disableForegroundMatching)
         return;
     
     //We can't simply match the frames since if the images are rotated, the frame property becomes unusable
@@ -741,7 +741,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         
         //Enable / Disable the reset button
         [self checkForCanReset];
-        
+        [self setFields:NO];
         return;
     }
 
@@ -760,14 +760,14 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             [self layoutInitialImage];
         } completion:^(BOOL complete) {
             [self setSimpleRenderMode:NO animated:YES];
+            [self setFields:NO];
         }];
     });
+    //[self setFields:NO];
 }
 
 - (void)toggleTranslucencyViewVisible:(BOOL)visible
 {
-    [self hideFields];
-    
     if (self.dynamicBlurEffect == NO) {
         self.translucencyView.alpha = visible ? 1.0f : 0.0f;
     }
@@ -809,6 +809,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 #pragma mark - Gesture Recognizer -
 - (void)gridPanGestureRecognized:(UIPanGestureRecognizer *)recognizer
 {
+    // Dont allow tap while with fields
+    if (self.isHaveFields){
+        return;
+    }
     CGPoint point = [recognizer locationInView:self];
     
     if (recognizer.state == UIGestureRecognizerStateBegan) {
@@ -947,6 +951,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.canBeReset = YES;
 }
 
+- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
+{
+    // TODO: сюда бы добавить вариативности, чтобы в кропвью можно было задавать, нужно ускорение или нет
+    [scrollView setContentOffset:scrollView.contentOffset animated:NO];
+}
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
     [self startResetTimer];
@@ -981,6 +991,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.gridPanGestureRecognizer.enabled = _cropBoxResizeEnabled;
 }
 
+/**
+ <#Description#>
+
+ @param cropBoxFrame <#cropBoxFrame description#>
+ */
 - (void)setCropBoxFrame:(CGRect)cropBoxFrame
 {
     if (CGRectEqualToRect(cropBoxFrame, _cropBoxFrame)) {
@@ -1279,8 +1294,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
-    CGFloat duration = editing ? 0.05f : 0.35f;
-    CGFloat delay = editing? 0.0f : 0.35f;
+    CGFloat duration = editing ? 0.05f : 0.15f;
+    CGFloat delay = editing? 0.0f : 0.15f;
     
     if (self.croppingStyle == TOCropViewCroppingStyleCircular) {
         delay = 0.0f;
@@ -1291,6 +1306,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     } completion:nil];
 }
 
+// Просто растягивает кроп до размеров свободного экрана
 - (void)moveCroppedContentToCenterAnimated:(BOOL)animated
 {
     if (self.internalLayoutDisabled)
@@ -1339,7 +1355,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         // in glitchy animations.
         //
         // Disable matching for now, and explicitly update at the end.
-        strongSelf.disableForgroundMatching = YES;
+        strongSelf.disableForegroundMatching = YES;
         {
             // Slight hack. This method needs to be called during `[UIViewController viewDidLayoutSubviews]`
             // in order for the crop view to resize itself during iPad split screen events.
@@ -1360,7 +1376,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
             
             strongSelf.cropBoxFrame = cropFrame;
         }
-        strongSelf.disableForgroundMatching = NO;
+        strongSelf.disableForegroundMatching = NO;
         
         //Explicitly update the matching at the end of the calculations
         [strongSelf matchForegroundToBackground];
@@ -1374,7 +1390,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     [self matchForegroundToBackground];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.01f * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [UIView animateWithDuration:0.5f
+        [UIView animateWithDuration:0.25f
                               delay:0.0f
              usingSpringWithDamping:1.0f
               initialSpringVelocity:1.0f
@@ -1407,26 +1423,43 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 // MARK: - NEW
 // NEW .this is what we are here for.
 
-- (void)setAspectFit
+- (void)toggleFields
 {
-    CGSize image = self.foregroundImageView.frame.size;
+    [self setFields:!self.isHaveFields];
+}
+
+- (void)setFields:(BOOL)withFields
+{
+    //[self.scrollView rollin:NO];
+    // For toggle
+    if (!withFields)
+    {
+        [self rotateForegroundForward:NO];
+        [self hideFields];
+        [self setFrame:_cropOriginFrame];
+        return;
+    }
+    
+    [self rotateForegroundForward:true];
+    
+    CGSize imSize = self.foregroundImageView.frame.size;
     CGSize crop = self.cropBoxFrame.size;
 
-    CGFloat s = crop.height/image.height;
-    image.height *= s;
-    image.width *= s;
+    CGFloat s = crop.height/imSize.height;
+    imSize.height *= s;
+    imSize.width *= s;
 
-    if (image.width > crop.width)
+    if (imSize.width > crop.width)
     {
-        s = crop.width/image.width;
-        image.height *= s;
-        image.width *= s;
+        s = crop.width/imSize.width;
+        imSize.height *= s;
+        imSize.width *= s;
     }
 
-    int x = (crop.width - image.width)/2;
-    int y = (crop.height - image.height)/2;
+    int x = (crop.width - imSize.width)/2;
+    int y = (crop.height - imSize.height)/2;
     
-    self.foregroundImageView.frame = CGRectMake(x, y, image.width, image.height);
+    self.foregroundImageView.frame = CGRectMake(x, y, imSize.width, imSize.height);
     [self showFields];
 }
 
@@ -1435,6 +1468,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.foregroundContainerView.backgroundColor = [UIColor whiteColor];
     self.gridOverlayView.hidden = YES;
     self.isHaveFields = YES;
+    self.scrollView.userInteractionEnabled = NO;
+    [self checkForCanReset];
 }
 
 - (void)hideFields
@@ -1442,7 +1477,20 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     self.foregroundContainerView.backgroundColor = [UIColor clearColor];
     self.gridOverlayView.hidden = NO;
     self.isHaveFields = NO;
+    self.scrollView.userInteractionEnabled = YES;
+    [self checkForCanReset];
 }
+
+- (void)rotateForegroundForward:(BOOL)forward
+{
+    int f = forward? 0: 1;
+    CGAffineTransform rotate = CGAffineTransformIdentity;
+
+    rotate = CGAffineTransformRotate(rotate, f*self.angle*M_PI/180);
+    
+    [self.foregroundImageView setTransform:rotate];
+}
+
 // MARK: -
 
 - (void)setAspectRatio:(CGSize)aspectRatio
@@ -1570,6 +1618,10 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)rotateImageNinetyDegreesAnimated:(BOOL)animated clockwise:(BOOL)clockwise
 {
+    // Dont allow rotate while with fields
+    if (self.isHaveFields)
+        return;
+    
     //Only allow one rotation animation at a time
     if (self.rotateAnimationInProgress)
         return;
@@ -1772,11 +1824,15 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     {
         canReset = YES;
     }
+    else if (self.isHaveFields) {
+        canReset = YES;
+    }
 
     self.canBeReset = canReset;
 }
 
 #pragma mark - Convienience Methods -
+// Прямоугольник за вычетом рамок
 - (CGRect)contentBounds
 {
     CGRect contentRect = CGRectZero;

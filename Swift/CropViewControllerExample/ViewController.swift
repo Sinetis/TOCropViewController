@@ -137,8 +137,8 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
     }
 
     @objc public func addButtonTapped(sender: AnyObject) {
-        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        let defaultAction = UIAlertAction(title: "Crop Image", style: .default) { (action) in
+//        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//        let defaultAction = UIAlertAction(title: "Crop Image", style: .default) { (action) in
             self.croppingStyle = .default
             
             let imagePicker = UIImagePickerController()
@@ -146,28 +146,28 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
             imagePicker.allowsEditing = false
             imagePicker.delegate = self
             self.present(imagePicker, animated: true, completion: nil)
-        }
-        
-        let profileAction = UIAlertAction(title: "Make Profile Picture", style: .default) { (action) in
-            self.croppingStyle = .circular
-            
-            let imagePicker = UIImagePickerController()
-            imagePicker.modalPresentationStyle = .popover
-            imagePicker.popoverPresentationController?.barButtonItem = (sender as! UIBarButtonItem)
-            imagePicker.preferredContentSize = CGSize(width: 320, height: 568)
-            imagePicker.sourceType = .photoLibrary
-            imagePicker.allowsEditing = false
-            imagePicker.delegate = self
-            self.present(imagePicker, animated: true, completion: nil)
-        }
-        
-        alertController.addAction(defaultAction)
-        alertController.addAction(profileAction)
-        alertController.modalPresentationStyle = .popover
-        
-        let presentationController = alertController.popoverPresentationController
-        presentationController?.barButtonItem = (sender as! UIBarButtonItem)
-        present(alertController, animated: true, completion: nil)
+//        }
+//        
+//        let profileAction = UIAlertAction(title: "Make Profile Picture", style: .default) { (action) in
+//            self.croppingStyle = .circular
+//            
+//            let imagePicker = UIImagePickerController()
+//            imagePicker.modalPresentationStyle = .popover
+//            imagePicker.popoverPresentationController?.barButtonItem = (sender as! UIBarButtonItem)
+//            imagePicker.preferredContentSize = CGSize(width: 320, height: 568)
+//            imagePicker.sourceType = .photoLibrary
+//            imagePicker.allowsEditing = false
+//            imagePicker.delegate = self
+//            self.present(imagePicker, animated: true, completion: nil)
+//        }
+//        
+//        alertController.addAction(defaultAction)
+//        alertController.addAction(profileAction)
+//        alertController.modalPresentationStyle = .popover
+//        
+//        let presentationController = alertController.popoverPresentationController
+//        presentationController?.barButtonItem = (sender as! UIBarButtonItem)
+//        present(alertController, animated: true, completion: nil)
     }
     
     @objc public func didTapImageView() {

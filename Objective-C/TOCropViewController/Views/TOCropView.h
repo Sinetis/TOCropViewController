@@ -293,7 +293,8 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
 /**
  
  */
-- (void)setAspectFit;
+- (void)toggleFields;
+- (void)setFields:(BOOL)withFields;
 // MARK: -
 
 @end
