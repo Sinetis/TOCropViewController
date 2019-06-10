@@ -131,6 +131,7 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     self.toolbar.rotateClockwiseButtonTapped        = ^{ [weakSelf rotateCropViewClockwise]; };
     // NEW
     self.toolbar.fieldsButtonTapped = ^{ [weakSelf createFieldsOnPhoto]; };
+    self.toolbar.rotateCropBoxButtonTapped = ^{ [weakSelf rotateCropBox]; };
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -681,13 +682,20 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     [self.cropView setAspectRatio:aspectRatio animated:animated];
 }
 
+- (void)rotateCropBox
+{
+    [self.cropView rotateCropNinetyDegreesAnimated:YES];
+}
+
 - (void)rotateCropViewClockwise
 {
+    //[self.cropView rotateCropNinetyDegreesAnimated:YES];
     [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:YES];
 }
 
 - (void)rotateCropViewCounterclockwise
 {
+    //[self.cropView rotateCropNinetyDegreesAnimated:YES];
     [self.cropView rotateImageNinetyDegreesAnimated:YES clockwise:NO];
 }
 
@@ -1142,6 +1150,15 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (BOOL)fieldsButtonHidden
 {
     return self.toolbar.fieldsButtonHidden;
+}
+
+- (void)setRotateCropBoxButtonHudden:(BOOL)rotateCropBoxButtonHidden
+{
+    self.toolbar.rotateCropBoxButtonHidden = rotateCropBoxButtonHidden;
+}
+- (BOOL)rotateCropBoxButtonHidden
+{
+    return self.toolbar.rotateCropBoxButton;
 }
 
 // MARK: -

@@ -1004,8 +1004,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     // Upon init, sometimes the box size is still 0 (or NaN), which can result in CALayer issues
     CGSize frameSize = cropBoxFrame.size;
-    if (frameSize.width < FLT_EPSILON || frameSize.height < FLT_EPSILON) { return; }
     if (isnan(frameSize.width) || isnan(frameSize.height)) { return; }
+    if (frameSize.width < FLT_EPSILON || frameSize.height < FLT_EPSILON) { return; }
 
     //clamp the cropping region to the inset boundaries of the screen
     CGRect contentFrame = self.contentBounds;
@@ -1430,37 +1430,51 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)setFields:(BOOL)withFields
 {
-    //[self.scrollView rollin:NO];
     // For toggle
     if (!withFields)
     {
         [self rotateForegroundForward:NO];
         [self hideFields];
-        [self setFrame:_cropOriginFrame];
+        [self layoutInitialImage];
+        //CGRect temp = self.cropBoxFrame;
+        //[self centerOfCGRect:temp];
+//        self.foregroundContainerView.frame = [self aspectFitCGRect:self.foregroundContainerView.frame
+//                                                                to:self.gridOverlayView.frame];
+//        self.foregroundImageView.frame = [self aspectFitCGRect:self.foregroundImageView.frame
+//                                                            to:self.foregroundContainerView.bounds];
         return;
     }
     
     [self rotateForegroundForward:true];
     
-    CGSize imSize = self.foregroundImageView.frame.size;
-    CGSize crop = self.cropBoxFrame.size;
-
-    CGFloat s = crop.height/imSize.height;
-    imSize.height *= s;
-    imSize.width *= s;
-
-    if (imSize.width > crop.width)
+    CGRect imRect = CGRectMake(0, 0, self.image.size.width, self.image.size.height);
+    CGRect crop = self.cropBoxFrame;
+    CGRect bound = self.contentBounds;
+    if ([self CGRectIsTall:imRect] && ![self CGRectIsTall:crop])
     {
-        s = crop.width/imSize.width;
-        imSize.height *= s;
-        imSize.width *= s;
+        crop = [self GetReversedCGRect:crop];
     }
-
-    int x = (crop.width - imSize.width)/2;
-    int y = (crop.height - imSize.height)/2;
+    if (![self CGRectIsTall:imRect] && [self CGRectIsTall:crop])
+    {
+        crop = [self GetReversedCGRect:crop];
+    }
     
-    self.foregroundImageView.frame = CGRectMake(x, y, imSize.width, imSize.height);
+    self.foregroundContainerView.frame = [self aspectFitCGRect:crop to:bound];
+    self.foregroundImageView.frame = [self aspectFitCGRect:imRect to:self.foregroundContainerView.bounds];
     [self showFields];
+}
+
+- (CGRect) aspectFitCGRect:(CGRect)rect to:(CGRect)to
+{
+    CGFloat s = MIN(to.size.height/rect.size.height, to.size.width/rect.size.width);
+    
+    CGRect res = rect;
+    res.size.width *= s;
+    res.size.height *= s;
+    res.origin.x = (to.size.width - res.size.width) * 0.5 + to.origin.x;
+    res.origin.y = (to.size.height - res.size.height) * 0.5 + to.origin.y;
+    
+    return res;
 }
 
 - (void)showFields
@@ -1794,6 +1808,74 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     }
     
     [self checkForCanReset];
+}
+
+// MARK: Ох-ёх! Поворачиваем рамку!
+- (void)rotateCropNinetyDegreesAnimated:(BOOL)animated
+{
+    [self hideFields];
+    
+    CGRect crop = [self GetReversedCGRect:self.gridOverlayView.frame];
+    CGRect content = self.contentBounds;
+    
+    CGFloat scale = MIN(content.size.width / crop.size.width,
+                        content.size.height / crop.size.height);
+    //scale = 1;
+    crop.size.height = crop.size.height * scale;
+    crop.size.width = crop.size.width * scale;
+    
+    crop.origin.x = (content.size.width - crop.size.width) * 0.5 + content.origin.x;
+    crop.origin.y = (content.size.height - crop.size.height) * 0.5 + content.origin.y;
+    
+    [UIView animateWithDuration:.12f animations:^{
+        self.overlayView.alpha = 0.0f;
+        self.translucencyView.alpha = 0.0f;
+    } completion:^(BOOL finished) {
+        [UIView animateWithDuration:0.25f animations:^{
+            self.gridOverlayView.transform = CGAffineTransformRotate(self.gridOverlayView.transform, M_PI_2);
+            self.cropBoxFrame = crop;
+        } completion:^(BOOL finished) {
+            [UIView animateWithDuration:.12f animations:^{
+                self.overlayView.alpha = 1.0f;
+                self.translucencyView.alpha = 1.0f;
+            }];
+        }];
+    }];
+    
+    //self.imageCropFrame = rotatedCrop;
+    [self checkForCanReset];
+}
+
+- (CGPoint)centerOfCGRect: (CGRect)rect
+{
+    return CGPointMake((rect.origin.x + rect.size.width) * 0.5, (rect.origin.y + rect.size.height) * 0.5);
+}
+
+- (CGRect)cropSize
+{
+    if (self.aspectRatio.width < FLT_EPSILON || self.aspectRatio.height < FLT_EPSILON)
+    {
+        return self.cropBoxFrame;
+    }
+    return CGRectMake(0, 0, self.aspectRatio.width, self.aspectRatio.height);
+}
+
+- (CGRect)GetReversedCGRect: (CGRect)rect
+{
+    return CGRectMake(rect.origin.x, rect.origin.y, rect.size.height, rect.size.width);
+}
+- (CGSize)GetReversedCGSize: (CGSize)size
+{
+    return CGSizeMake(size.height, size.width);
+}
+
+- (BOOL)CGSizeIsTall: (CGSize)size
+{
+    return size.height > size.width;
+}
+- (BOOL)CGRectIsTall: (CGRect)rect
+{
+    return rect.size.height > rect.size.width;
 }
 
 - (void)captureStateForImageRotation

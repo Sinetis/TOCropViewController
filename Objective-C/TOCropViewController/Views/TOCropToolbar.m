@@ -37,6 +37,7 @@
 @property (nonatomic, strong) UIButton *resetButton;
 @property (nonatomic, strong) UIButton *clampButton;
 @property (nonatomic, strong) UIButton *fieldsButton; // NEW
+@property (nonatomic, strong) UIButton *rotateCropBoxButton; // NEW
 @property (nonatomic, strong) UIButton *rotateButton; // defaults to counterclockwise button for legacy compatibility
 
 @property (nonatomic, assign) BOOL reverseContentLayout; // For languages like Arabic where they natively present content flipped from English
@@ -155,6 +156,13 @@
     [_fieldsButton setImage:[TOCropToolbar fieldsImage] forState:UIControlStateNormal];
     [_fieldsButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_fieldsButton];
+    
+    _rotateCropBoxButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    _rotateCropBoxButton.contentMode = UIViewContentModeCenter;
+    _rotateCropBoxButton.tintColor = [UIColor whiteColor];
+    [_rotateCropBoxButton setImage:[TOCropToolbar rotateCropBoxImage] forState:UIControlStateNormal];
+    [_rotateCropBoxButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    [self addSubview:_rotateCropBoxButton];
 }
 
 - (void)layoutSubviews
@@ -246,6 +254,10 @@
         
         if (!self.fieldsButtonHidden) {
             [buttonsInOrderHorizontally addObject:self.fieldsButton];
+        }
+        
+        if (!self.rotateCropBoxButtonHidden) {
+            [buttonsInOrderHorizontally addObject:self.rotateCropBoxButton];
         }
         
         if (!self.clampButtonHidden) {
@@ -343,12 +355,13 @@
     }
     else if (button == self.clampButton && self.clampButtonTapped) {
         self.clampButtonTapped();
-        return;
     }
     // NEW
     else if (button == self.fieldsButton && self.fieldsButtonTapped) {
         self.fieldsButtonTapped();
-        return;
+    }
+    else if (button == self.rotateCropBoxButton && self.rotateCropBoxButtonTapped) {
+        self.rotateCropBoxButtonTapped();
     }
 }
 
@@ -518,6 +531,43 @@
     UIImage *rotateCWImage = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return rotateCWImage;
+}
+
++ (UIImage *)rotateCropBoxImage
+{
+    UIImage *rotateImage = nil;
+    
+    UIGraphicsBeginImageContextWithOptions((CGSize){18,21}, NO, 0.0f);
+    {
+        //// Rectangle 2 Drawing
+        UIBezierPath* rectangle2Path = [UIBezierPath bezierPathWithRect: CGRectMake(17, 9, -11, 11)];
+        [UIColor.whiteColor setStroke];
+        rectangle2Path.lineWidth = 1;
+        [rectangle2Path stroke];
+        
+        
+        //// Rectangle 3 Drawing
+        UIBezierPath* rectangle3Path = UIBezierPath.bezierPath;
+        [rectangle3Path moveToPoint: CGPointMake(13, 3)];
+        [rectangle3Path addLineToPoint: CGPointMake(8, 6)];
+        [rectangle3Path addLineToPoint: CGPointMake(8, 0)];
+        [rectangle3Path closePath];
+        [UIColor.whiteColor setFill];
+        [rectangle3Path fill];
+        
+        
+        //// Bezier Drawing
+        UIBezierPath* bezierPath = UIBezierPath.bezierPath;
+        [bezierPath moveToPoint: CGPointMake(8, 3)];
+        [bezierPath addCurveToPoint: CGPointMake(0.5, 11) controlPoint1: CGPointMake(3, 3) controlPoint2: CGPointMake(0.5, 5.91)];
+        [UIColor.whiteColor setStroke];
+        bezierPath.lineWidth = 1;
+        [bezierPath stroke];
+        rotateImage = UIGraphicsGetImageFromCurrentImageContext();
+    }
+    UIGraphicsEndImageContext();
+    
+    return rotateImage;
 }
 
 // NEW FIELDS IMAGE

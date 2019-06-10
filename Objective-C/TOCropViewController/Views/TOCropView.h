@@ -295,6 +295,8 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  */
 - (void)toggleFields;
 - (void)setFields:(BOOL)withFields;
+
+- (void)rotateCropNinetyDegreesAnimated:(BOOL)animated;
 // MARK: -
 
 @end

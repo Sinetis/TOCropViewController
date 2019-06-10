@@ -57,6 +57,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, assign) BOOL fieldsButtonHidden;
 @property (nullable, nonatomic, copy) void (^fieldsButtonTapped)(void);
 
+@property (nonnull, nonatomic, strong, readonly) UIButton *rotateCropBoxButton;
+@property (nonatomic, assign) BOOL rotateCropBoxButtonHidden;
+@property (nullable, nonatomic, copy) void (^rotateCropBoxButtonTapped)(void);
+
 @property (nonnull, nonatomic, readonly) UIButton *rotateButton; // Points to `rotateCounterClockwiseButton`
 
 /* Button feedback handler blocks */
