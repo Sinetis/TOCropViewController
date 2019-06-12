@@ -324,6 +324,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         [self placeAlertIcon];
         [self.qualityButton setImage:[self.qualityDelegate getAlertIcon]
                             forState:UIControlStateNormal];
+        self.qualityButton.tintColor = UIColor.yellowColor;
         
         [self.qualityButton addTarget:self
                                action:@selector(showQualityAlert)
