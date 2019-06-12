@@ -25,7 +25,8 @@
 #import "TOCropViewConstants.h"
 #import "TOCropView.h"
 #import "TOCropToolbar.h"
-#import "Models/TOCropQualityDelegate.h"
+//#import "Models/TOCropQualityDelegate.h"
+#import "TOCropQualityDelegate.h"
 
 @class TOCropViewController;
 
