@@ -27,6 +27,7 @@
 #import "UIImage+CropRotate.h"
 #import "TOCroppedImageAttributes.h"
 
+
 static const CGFloat kTOCropViewControllerTitleTopPadding = 14.0f;
 static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
@@ -66,6 +67,8 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 /* Flag to perform initial setup on the first run */
 @property (nonatomic, assign) BOOL firstTime;
+
+
 
 @end
 
@@ -1310,6 +1313,15 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 - (CGFloat)minimumAspectRatio
 {
     return self.cropView.minimumAspectRatio;
+}
+
+- (id<TOCropQualityDelegate>)qualityDelegate {
+    return self.qualityDelegate;
+}
+
+- (void)setQualityDelegate:(id<TOCropQualityDelegate>)qualityDelegate
+{
+    self.cropView.qualityDelegate = qualityDelegate;
 }
 
 @end

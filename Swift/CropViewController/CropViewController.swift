@@ -83,6 +83,15 @@ public typealias CropViewCroppingStyle = TOCropViewCroppingStyle
     @objc optional func cropViewController(_ cropViewController: CropViewController, didFinishCancelled cancelled: Bool)
 }
 
+//@objc public protocol CropQualityDelegate: NSObjectProtocol {
+//    
+//    @objc func getAlertIcon() -> UIImage
+//    
+//    @objc func checkQuality(for size: CGSize) -> Bool
+//    
+//    @objc func showAlert()
+//}
+
 ///------------------------------------------------
 /// @name Class
 ///------------------------------------------------
@@ -100,6 +109,10 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
     */
     public weak var delegate: CropViewControllerDelegate? {
         didSet { self.setUpDelegateHandlers() }
+    }
+    
+    public var qualityDelegate: TOCropQualityDelegate? {
+        didSet { toCropViewController.qualityDelegate = qualityDelegate }
     }
     
     /**
@@ -624,5 +637,6 @@ extension CropViewController {
             }
         }
     }
+    
 }
 

@@ -53,6 +53,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 @property (nonatomic, strong, readwrite) UIImage *image;
 @property (nonatomic, assign, readwrite) TOCropViewCroppingStyle croppingStyle;
 
+@property (nullable, nonatomic, strong) UIButton *qualityButton;
 /* Views */
 @property (nonatomic, strong) UIImageView *backgroundImageView;     /* The main image view, placed within the scroll view */
 @property (nonatomic, strong) UIView *backgroundContainerView;      /* A view which contains the background image view, to separate its transforms from the scroll view. */
@@ -289,6 +290,61 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     //Check if we performed any resetabble modifications
     [self checkForCanReset];
 }
+
+// MARK: - Quality
+
+- (IBAction)showQualityAlert
+{
+    if (self.qualityDelegate != NULL)
+    {
+        [self.qualityDelegate showAlert];
+    }
+}
+
+- (void)checkQuality
+{
+    if (self.qualityDelegate == NULL)
+        return;
+    
+    CGSize sizeInPixels = self.cropBoxFrame.size;
+    CGFloat pixelsInPoint = CGImageGetWidth(self.image.CGImage) / self.foregroundImageView.frame.size.width;
+    sizeInPixels.height *= pixelsInPoint;
+    sizeInPixels.width *= pixelsInPoint;
+    self.qualityButton.hidden = ![self.qualityDelegate checkQualityForPixelSize:sizeInPixels];
+}
+
+- (void)placeAlertIcon
+{
+    if (self.qualityDelegate == NULL)
+        return;
+    
+    if (self.qualityButton == NULL)
+    {
+        self.qualityButton = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+        [self placeAlertIcon];
+        [self.qualityButton setImage:[self.qualityDelegate getAlertIcon]
+                            forState:UIControlStateNormal];
+        
+        [self.qualityButton addTarget:self
+                               action:@selector(showQualityAlert)
+                     forControlEvents:UIControlEventTouchUpInside];
+        
+        [self.superview addSubview:self.qualityButton];
+    }
+    
+    [self checkQuality];
+    
+    CGFloat left, top, width, height, padding = 4;
+    width = 44; height = 44;
+    CGRect rect = self.cropBoxFrame;
+    //rect.origin.x = 0;
+    //rect.origin.y = 0;
+    top = rect.origin.y + padding;
+    left = rect.origin.x + rect.size.width - width - padding;
+    self.qualityButton.frame = CGRectMake(left, top, width, height);
+}
+
+// MARK: -
 
 - (void)layoutInitialImage
 {
@@ -810,9 +866,11 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 - (void)gridPanGestureRecognized:(UIPanGestureRecognizer *)recognizer
 {
     // Dont allow tap while with fields
-    if (self.isHaveFields){
+    if (self.isHaveFields)
+    {
         return;
     }
+    
     CGPoint point = [recognizer locationInView:self];
     
     if (recognizer.state == UIGestureRecognizerStateBegan) {
@@ -1380,6 +1438,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         
         //Explicitly update the matching at the end of the calculations
         [strongSelf matchForegroundToBackground];
+        [strongSelf placeAlertIcon];
     };
     
     if (!animated) {
@@ -1834,6 +1893,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         [UIView animateWithDuration:0.25f animations:^{
             self.gridOverlayView.transform = CGAffineTransformRotate(self.gridOverlayView.transform, M_PI_2);
             self.cropBoxFrame = crop;
+            [self placeAlertIcon];
         } completion:^(BOOL finished) {
             [UIView animateWithDuration:.12f animations:^{
                 self.overlayView.alpha = 1.0f;
@@ -1888,6 +1948,8 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 #pragma mark - Resettable State -
 - (void)checkForCanReset
 {
+    [self placeAlertIcon];
+    
     BOOL canReset = NO;
     
     if (self.angle != 0) { //Image has been rotated

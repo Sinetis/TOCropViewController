@@ -25,6 +25,7 @@
 #import "TOCropViewConstants.h"
 #import "TOCropView.h"
 #import "TOCropToolbar.h"
+#import "Models/TOCropQualityDelegate.h"
 
 @class TOCropViewController;
 
@@ -89,6 +90,10 @@
 
 @end
 
+///------------------------------------------------
+/// @name Class
+///------------------------------------------------
+
 @interface TOCropViewController : UIViewController
 
 /**
@@ -106,6 +111,8 @@
  cropped image, as well as crop information.
  */
 @property (nullable, nonatomic, weak) id<TOCropViewControllerDelegate> delegate;
+
+@property (nullable, nonatomic, weak) id<TOCropQualityDelegate> qualityDelegate;
 
 /**
  If true, when the user hits 'Done', a UIActivityController will appear
@@ -314,6 +321,7 @@
 
 // MARK: NEW
 @property (nullable, nonatomic, strong) void (^onDidCropToRectWithFields)(UIImage* _Nonnull image, CGRect cropRect, NSInteger angle, BOOL withFields);
+
 
 /**
  If the cropping style is set to circular, this block will return a circle-cropped version of the selected

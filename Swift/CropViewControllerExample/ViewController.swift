@@ -23,6 +23,7 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         
         let cropController = CropViewController(croppingStyle: croppingStyle, image: image)
         cropController.delegate = self
+        cropController.qualityDelegate = self
         
         // Uncomment this if you wish to provide extra instructions via a title label
         //cropController.title = "Crop Image"
@@ -226,5 +227,24 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         activityController.popoverPresentationController?.barButtonItem = navigationItem.rightBarButtonItem!
         present(activityController, animated: true, completion: nil)
     }
+}
+
+extension ViewController: TOCropQualityDelegate {
+    
+    func getAlertIcon() -> UIImage {
+        return #imageLiteral(resourceName: "Icon")
+    }
+    
+    func checkQuality(forPixelSize size: CGSize) -> Bool {
+        return size.width > size.height
+    }
+    
+    @objc func showAlert() {
+        
+        let alertView = UIAlertView(title: "Error", message: "Bad quality", delegate: nil, cancelButtonTitle: "ok")
+        alertView.show()
+    }
+    
+    
 }
 

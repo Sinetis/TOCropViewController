@@ -22,7 +22,7 @@
 
 #import <UIKit/UIKit.h>
 #import "TOCropViewConstants.h"
-
+#import "../Models/TOCropQualityDelegate.h"
 @class TOCropOverlayView;
 @class TOCropView;
 
@@ -39,6 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 // NEW
 @property (nonatomic, assign, readonly) BOOL isHaveFields;
+
+@property (nullable, nonatomic, weak) id<TOCropQualityDelegate> qualityDelegate;
 
 /**
  The image that the crop view is displaying. This cannot be changed once the crop view is instantiated.
@@ -297,7 +299,9 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
 - (void)setFields:(BOOL)withFields;
 
 - (void)rotateCropNinetyDegreesAnimated:(BOOL)animated;
+
 // MARK: -
+
 
 @end
 
