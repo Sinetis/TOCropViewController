@@ -22,7 +22,8 @@
 
 #import <UIKit/UIKit.h>
 #import "TOCropViewConstants.h"
-#import "../Models/TOCropQualityDelegate.h"
+//#import "../Models/TOCropQualityDelegate.h"
+#import "TOCropQualityDelegate.h"
 @class TOCropOverlayView;
 @class TOCropView;
 
