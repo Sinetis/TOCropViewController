@@ -236,7 +236,7 @@ extension ViewController: TOCropQualityDelegate {
     }
     
     func checkQuality(forPixelSize size: CGSize) -> Bool {
-        return size.width > size.height
+        return size.width < 300
     }
     
     @objc func showAlert() {

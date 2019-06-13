@@ -190,6 +190,7 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
  */
 @property (nonatomic, assign) BOOL translucencyAlwaysHidden;
 
+@property (nonatomic, assign, readonly) BOOL editing;
 ///*
 // if YES it will always show grid
 // if NO it will never show grid

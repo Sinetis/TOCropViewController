@@ -29,7 +29,7 @@
 #define TOCROPVIEW_BACKGROUND_COLOR [UIColor colorWithWhite:0.12f alpha:1.0f]
 
 static const CGFloat kTOCropViewPadding = 14.0f;
-static const NSTimeInterval kTOCropTimerDuration = 0.8f;
+static const NSTimeInterval kTOCropTimerDuration = 0.0f;
 static const CGFloat kTOCropViewMinimumBoxSize = 42.0f;
 static const CGFloat kTOCropViewCircularPathRadius = 300.0f;
 static const CGFloat kTOMaximumZoomScale = 15.0f;
@@ -305,7 +305,13 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 {
     if (self.qualityDelegate == NULL)
         return;
-    
+    if (self.qualityButton == NULL)
+        return;
+    [self _checkQuality];
+}
+
+- (void)_checkQuality
+{
     CGSize sizeInPixels = self.cropBoxFrame.size;
     CGFloat pixelsInPoint = CGImageGetWidth(self.image.CGImage) / self.foregroundImageView.frame.size.width;
     sizeInPixels.height *= pixelsInPoint;
@@ -333,7 +339,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         [self.superview addSubview:self.qualityButton];
     }
     
-    [self checkQuality];
+    [self _checkQuality];
     
     CGFloat left, top, width, height, padding = 4;
     width = 44; height = 44;
@@ -1032,6 +1038,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     if (scrollView.isTracking) {
         self.cropBoxLastEditedZoomScale = scrollView.zoomScale;
         self.cropBoxLastEditedMinZoomScale = scrollView.minimumZoomScale;
+        [self checkQuality];
     }
     
     [self matchForegroundToBackground];
@@ -1353,7 +1360,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
         return;
     }
     
-    CGFloat duration = editing ? 0.05f : 0.15f;
+    CGFloat duration = editing ? 0.1f : 0.3f;
     CGFloat delay = editing? 0.0f : 0.15f;
     
     if (self.croppingStyle == TOCropViewCroppingStyleCircular) {
@@ -1485,6 +1492,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 - (void)toggleFields
 {
+    if (self.editing)
+        return;
+    
     [self setFields:!self.isHaveFields];
 }
 

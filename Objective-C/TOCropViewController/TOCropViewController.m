@@ -920,6 +920,10 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
 
 - (void)doneButtonTapped
 {
+    
+    if (self.cropView.editing)
+        return;
+    
     CGRect cropFrame = self.cropView.imageCropFrame;
     NSInteger angle = self.cropView.angle;
 
