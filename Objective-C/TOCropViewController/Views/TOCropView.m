@@ -1885,6 +1885,9 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 {
     [self hideFields];
     
+    BOOL max = self.cropBoxFrame.size.width == self.foregroundImageView.bounds.size.width
+         || self.cropBoxFrame.size.height == self.foregroundImageView.bounds.size.height;
+    
     CGRect crop = [self GetReversedCGRect:self.gridOverlayView.frame];
     CGRect content = self.contentBounds;
     
@@ -1903,6 +1906,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     } completion:^(BOOL finished) {
         [UIView animateWithDuration:0.25f animations:^{
             self.gridOverlayView.transform = CGAffineTransformRotate(self.gridOverlayView.transform, M_PI_2);
+            if (max) [self layoutInitialImage];
             self.cropBoxFrame = crop;
             [self placeAlertIcon];
         } completion:^(BOOL finished) {
