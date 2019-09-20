@@ -38,8 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TOCropView : UIView
 
-// NEW
+// MARK: NEW
 @property (nonatomic, assign, readonly) BOOL isHaveFields;
+@property (nonatomic, assign, readwrite) BOOL disableAutoRotate;
 
 @property (nullable, nonatomic, weak) id<TOCropQualityDelegate> qualityDelegate;
 
@@ -301,6 +302,7 @@ The minimum croping aspect ratio. If set, user is prevented from setting croppin
 - (void)setFields:(BOOL)withFields;
 
 - (void)rotateCropNinetyDegreesAnimated:(BOOL)animated;
+
 
 // MARK: -
 

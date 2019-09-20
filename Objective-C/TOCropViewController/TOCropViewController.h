@@ -240,6 +240,7 @@
 // MARK: NEW
 //--------------------------------------------------------------------------------------------------------------
 @property (nonatomic, assign) BOOL fieldsButtonHidden;
+@property (nonatomic, assign) BOOL disableRotateFields;
 
 /*
  If this controller is embedded in UINavigationController its navigation bar is hidden by default. Set this property to false to show the navigation bar. This must be set before this controller is presented.

@@ -46,6 +46,8 @@ class ViewController: UIViewController, CropViewControllerDelegate, UIImagePicke
         ////cropController.fieldsButtonHidden = true
         //cropController.doneButtonTitle = "Title"
         //cropController.cancelButtonTitle = "Title"
+        cropController.customAspectRatio = CGSize(width: 2, height: 1)
+        cropController.disableRotateFields = false
         
         self.image = image
         

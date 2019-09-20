@@ -285,6 +285,12 @@ open class CropViewController: UIViewController, TOCropViewControllerDelegate {
         get { return toCropViewController.fieldsButtonHidden }
     }
     
+    // NEW
+    public var disableRotateFields: Bool {
+        set { toCropViewController.disableRotateFields = newValue }
+        get { return toCropViewController.disableRotateFields }
+    }
+    
     /**
      If `showActivitySheetOnDone` is true, then these activity items will
      be supplied to that UIActivityViewController in addition to the

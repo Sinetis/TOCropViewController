@@ -115,6 +115,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 // NEW
 @property (nonatomic, assign, readwrite) BOOL isHaveFields;
+//@property (nonatomic, assign, readwrite) BOOL disableAutoRotate;
 
 @end
 
@@ -198,7 +199,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     //Translucency View
     if (NSClassFromString(@"UIVisualEffectView")) {
-        self.translucencyEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleDark];
+        self.translucencyEffect = [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight];
         self.translucencyView = [[UIVisualEffectView alloc] initWithEffect:self.translucencyEffect];
         self.translucencyView.frame = self.bounds;
     }
@@ -253,6 +254,7 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     
     // NEW
     self.isHaveFields = NO;
+    self.disableAutoRotate = NO;
 }
 
 #pragma mark - View Layout -
@@ -1520,13 +1522,24 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
     CGRect imRect = CGRectMake(0, 0, self.image.size.width, self.image.size.height);
     CGRect crop = self.cropBoxFrame;
     CGRect bound = self.contentBounds;
-    if ([self CGRectIsTall:imRect] && ![self CGRectIsTall:crop])
+    
+    if (!_disableAutoRotate)
     {
-        crop = [self GetReversedCGRect:crop];
+        if ([self CGRectIsTall:imRect] && ![self CGRectIsTall:crop])
+        {
+            crop = [self GetReversedCGRect:crop];
+        }
+        if (![self CGRectIsTall:imRect] && [self CGRectIsTall:crop])
+        {
+            crop = [self GetReversedCGRect:crop];
+        }
     }
-    if (![self CGRectIsTall:imRect] && [self CGRectIsTall:crop])
+    else
     {
-        crop = [self GetReversedCGRect:crop];
+        if ([self CGSizeIsTall:_aspectRatio] != [self CGRectIsTall:crop])
+        {
+            crop = [self GetReversedCGRect:crop];
+        }
     }
     
     self.foregroundContainerView.frame = [self aspectFitCGRect:crop to:bound];

@@ -1168,6 +1168,17 @@ static const CGFloat kTOCropViewControllerToolbarHeight = 44.0f;
     return self.toolbar.rotateCropBoxButton;
 }
 
+- (void)setDisableRotateFields:(BOOL)disableRotateFields
+{
+    self.cropView.disableAutoRotate = disableRotateFields;
+}
+
+- (BOOL)disableRotateFields
+{
+    return self.cropView.disableAutoRotate;
+}
+
+
 // MARK: -
 
 - (BOOL)rotateButtonsHidden
