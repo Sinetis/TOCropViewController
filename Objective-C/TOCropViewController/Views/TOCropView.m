@@ -121,6 +121,12 @@ typedef NS_ENUM(NSInteger, TOCropViewOverlayEdge) {
 
 @implementation TOCropView
 
+- (void)setIsHaveFields:(BOOL)isHaveFields {
+    _isHaveFields = isHaveFields;
+    _translucencyView.hidden = !isHaveFields;
+    _translucencyAlwaysHidden = !isHaveFields;
+}
+
 - (instancetype)initWithImage:(UIImage *)image
 {
     return [self initWithCroppingStyle:TOCropViewCroppingStyleDefault image:image];
